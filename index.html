@@ -45,6 +45,8 @@
         </div>
         <h3>当前请求信息</h3>
         <div id="request-info" style="text-align: left; font-size: .65rem"></div>
+        <h3>在终端中使用</h3>
+        <p><code style="user-select: all">curl -o- https://lab.skk.moe/cf-threat/test.sh | bash</code></p>
     </section>
     <script>
         let _get = (url, type) =>
@@ -96,7 +98,7 @@
             return `<span class="${color}" style="font-size: 2rem; vertical-align: middle; margin: 0 8px;">${score}</span>`
         }
 
-        let score = 70;
+        let score = 100;
 
         function runcheck(level) {
             if (level === 0) {
@@ -120,7 +122,7 @@
         runcheck(score);
     </script>
     <script>window.ga_tid = "UA-122669675-3"; window.ga_url = "https://ga.giuem.com";</script>
-    <script src="https://cdn.jsdelivr.net/npm/@giuem/ga-proxy" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@giuem/ga-proxy" async></script>
 </body>
 
 </html>
