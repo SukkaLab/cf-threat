@@ -49,7 +49,7 @@
         <p><code style="user-select: all">curl -o- https://lab.skk.moe/cf-threat/test.sh | bash</code></p>
     </section>
     <script>
-        let _get = (url, type) =>
+        const _get = (url, type) =>
             fetch(url, { method: 'GET' }).then((resp) => {
                 if (type === 'text')
                     return Promise.all([resp.ok, resp.status, resp.text(), resp.headers]);
@@ -85,7 +85,7 @@
                 document.getElementById('request-info').innerHTML = `<p><strong>IP:</strong> ${data.ip}</p><p><strong>Loc:</strong> ${data.loc}</p><p><strong>TLS:</strong> ${data.tls}</p><p><strong>User-Agent: </strong>${data.uag}</p>`
             })
 
-        let output = (score) => {
+        const output = (score) => {
             let color = '';
             if (score < 5) {
                 color = 'sk-text-success'
@@ -98,7 +98,7 @@
             return `<span class="${color}" style="font-size: 2rem; vertical-align: middle; margin: 0 8px;">${score}</span>`
         }
 
-        let score = 100;
+        const score = 100;
 
         function runcheck(level) {
             if (level === 0) {
@@ -121,8 +121,8 @@
 
         runcheck(score);
     </script>
-    <script>window.ga_tid = "UA-122669675-3"; window.ga_url = "https://ga.giuem.com";</script>
-<script src="https://cdn.jsdelivr.net/npm/@giuem/ga-proxy" async></script>
+    <script>window.ga_tid = "UA-122669675-3", window.ga_api = "https://d.skk.moe/p/"</script>
+    <script src="https://cdn.jsdelivr.net/npm/cfga@1.0.1"></script>
 </body>
 
 </html>
