@@ -8,7 +8,7 @@ http_code=200
 x=71
 i=1
 
-echo "Testing. It may takes about 30 seconds..."
+echo "Testing. It may take about 30 seconds..."
 
 while [ "$http_code" = "200" ]; do
     x=$[x-i]
