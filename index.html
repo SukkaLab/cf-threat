@@ -39,7 +39,7 @@
         <h1>Cloudflare Threat Score Test</h1>
         <p>测试你当前在 Cloudflare 的声誉</p>
         <br><br>
-        <div id="threat-score" style="text-align: center">正在测试中，大概需要 10 ~ 30 秒....</div>
+        <div id="threat-score" style="text-align: center">正在测试中，大概需要 5 ~ 10 秒....</div>
         <div style="text-align: left; margin: 30px 0;">
             <p style="font-size: .7rem">Cloudflare 会对每个请求进行风险评估。0 表示 Cloudflare 判定为低风险，高于 10 代表 Cloudflare 判定为爬虫或者垃圾邮件发送者，高于 40 则代表 Cloudflare 判定为有严重不良行为的 IP（如僵尸网络等）。这个数值一般不会大于 60。</p>
         </div>
@@ -49,77 +49,77 @@
         <p><code style="user-select: all">curl -o- https://lab.skk.moe/cf-threat/test.sh | bash</code></p>
     </section>
     <script>
-        const _get = (url, type) =>
-            fetch(url, { method: 'GET' }).then((resp) => {
-                if (type === 'text')
-                    return Promise.all([resp.ok, resp.status, resp.text(), resp.headers]);
-                else {
-                    return Promise.all([resp.ok, resp.status, resp.json(), resp.headers]);
-                }
-            }).then(([ok, status, data, headers]) => {
-                if (ok) {
-                    let json = {
-                        ok,
-                        status,
-                        data,
-                        headers
+        ((document) => {
+            const _get = (url, type) =>
+                fetch(url, { method: 'GET' }).then((resp) => {
+                    if (type === 'text')
+                        return Promise.all([resp.ok, resp.status, resp.text(), resp.headers]);
+                    else {
+                        return Promise.all([resp.ok, resp.status, resp.json(), resp.headers]);
                     }
-                    return json;
-                } else {
-                    throw new Error(JSON.stringify(json.error));
-                }
-            }).catch(error => {
-                throw error;
-            })
+                }).then(([ok, status, data, headers]) => {
+                    if (ok) {
+                        let json = {
+                            ok,
+                            status,
+                            data,
+                            headers
+                        }
+                        return json;
+                    } else {
+                        throw new Error(JSON.stringify(json.error));
+                    }
+                }).catch(error => {
+                    throw error;
+                })
 
-        _get('https://cf-threat.sukkaw.com/cdn-cgi/trace', 'text')
-            .then(resp => {
-                let data = {};
-                for (let i of resp.data.split('\n')) {
-                    let x = i.split('=');
-                    data[x[0]] = x[1];
-                }
-                return data;
-            })
-            .then(data => {
-                document.getElementById('request-info').innerHTML = `<p><strong>IP:</strong> ${data.ip}</p><p><strong>Loc:</strong> ${data.loc}</p><p><strong>TLS:</strong> ${data.tls}</p><p><strong>User-Agent: </strong>${data.uag}</p>`
-            })
+            _get('https://cf-threat.sukkaw.com/cdn-cgi/trace', 'text')
+                .then(resp => {
+                    let data = {};
+                    for (let i of resp.data.split('\n')) {
+                        let x = i.split('=');
+                        data[x[0]] = x[1];
+                    }
+                    return data;
+                })
+                .then(data => {
+                    document.getElementById('request-info').innerHTML = `<p><strong>IP:</strong> ${data.ip}</p><p><strong>Loc:</strong> ${data.loc}</p><p><strong>TLS:</strong> ${data.tls}</p><p><strong>User-Agent: </strong>${data.uag}</p>`
+                })
 
-        const output = (score) => {
-            let color = '';
-            if (score < 5) {
-                color = 'sk-text-success'
-            } else if (score < 20) {
-                color = 'sk-text-warning'
-            } else if (score < 100) {
-                color = 'sk-text-error'
+            const output = (score) => {
+                let color = '';
+                if (score < 5) {
+                    color = 'sk-text-success'
+                } else if (score < 20) {
+                    color = 'sk-text-warning'
+                } else if (score < 100) {
+                    color = 'sk-text-error'
+                }
+
+                return `<span class="${color}" style="font-size: 2rem; vertical-align: middle; margin: 0 8px;">${score}</span>`
             }
 
-            return `<span class="${color}" style="font-size: 2rem; vertical-align: middle; margin: 0 8px;">${score}</span>`
-        }
+            const promises = [];
 
-        let score = 100;
+            const runcheck = (level) => new Promise((resolve, reject) => {
+                let img = new Image;
 
-        function runcheck(level) {
-            if (level === 0) {
-                score = 0;
+                img.onerror = () => resolve(level);
+                img.onload = () => resolve();
+
+                img.src = `https://cf-threat.sukkaw.com/collect.gif?threat=${level}&${+(new Date)}`;
+            });
+
+            for (let i = 100; i >= 0; i--) {
+                promises.push(runcheck(i));
             }
-            let img = new Image;
 
-            img.onerror = () => {
-                score = level;
+            Promise.all(promises).then(fullfills => {
+                const score = fullfills.filter(n => n !== undefined)[0];
+
                 document.getElementById('threat-score').innerHTML = `<span style="vertical-align: middle;">你当前在 Cloudflare 的威胁指数是</span> ${output(score)}`;
-                return;
-            }
-
-            img.onload = () => {
-                runcheck(level - 1);
-            }
-
-            img.src = `https://cf-threat.sukkaw.com/collect.gif?threat=${level}&${+(new Date)}`;
-        }
-
-        runcheck(score);
+            });
+        })(document);
     </script>
     <script>window.ga_tid = "UA-122669675-3", window.ga_api = "https://d.skk.moe/p/"</script>
     <script src="https://cdn.jsdelivr.net/npm/cfga@1.0.1"></script>
