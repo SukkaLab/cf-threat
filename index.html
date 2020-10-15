@@ -107,7 +107,7 @@
                 img.onerror = () => resolve(level);
                 img.onload = () => resolve();
 
-                img.src = `https://cf-threat.sukkaw.com/collect.gif?threat=${level}&${+(new Date)}`;
+                img.src = `https://cf-threat.sukkaw.com/i.gif?threat=${level}&${+(new Date)}`;
             });
 
             for (let i = 100; i >= 0; i--) {
